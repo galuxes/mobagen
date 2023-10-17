@@ -4,7 +4,20 @@
 
 Point2D Cat::Move(World* world)
 {
-  int numSteps = 0;
+
+  /*auto neighbors = GetNeighbors(world->getCat(), world);
+
+  if(neighbors.back() == exit)
+  {
+    return exit;
+  }else{
+    auto ranNum = Random::Range(0,neighbors.size()-1);
+    return neighbors[ranNum];
+  }*/
+
+  return FindNearestExit(world->getCat(), world);
+
+  /*int numSteps = 0;
   bool exitFound = false;
 
   frontier.push_back(world->getCat());
@@ -35,78 +48,34 @@ Point2D Cat::Move(World* world)
 
   vector<Point2D> open, closed;
 
-  return exit;
+  return exit;*/
 
 }
 
-vector<Point2D> Cat::GetNeighbors(Point2D point, World* world)//returns true if found exit
+Point2D Cat::FindNearestExit(Point2D point, World* world)
 {
-  vector<Point2D> neighbors;
-  Point2D tile;
-  for (int i = 0; i < 6; i++)
+  frontier.push_back(point);
+
+  while(exit == Point2D(INT_MAX, INT_MAX))
   {
-    bool tileValid = true;
-    switch (i)
-    {
-      case 0:
-        tile = world->E(point);
-        break;
-      case 1:
-        tile = world->NE(point);
-        break;
-      case 2:
-        tile = world->NW(point);
-        break;
-      case 3:
-        tile = world->W(point);
-        break;
-      case 4:
-        tile = world->SW(point);
-        break;
-      case 5:
-        tile = world->SE(point);
-        break;
-      default:
-        break;
-    }
 
-    if (!world->isValidPosition(tile))//checks in bounds
+    for(Point2D p : frontier)
     {
-      tileValid = false;
-    }
 
-    if(world->getContent(tile))//checks if blocked
-    {
-      tileValid = false;
-    }
+      auto neighbors = GetNeighbors(p, world);
 
-    for (int j = 0; j < neighbors.size(); j++)//checks not in list already
-    {
-      if(neighbors[i] == tile)
+      for (Point2D n : neighbors)
       {
-        tileValid = false;
+        nextFrontier.push_back(n);
       }
-    }
 
-    for (int j = 0; j < nextFrontier.size(); j++)//checks not in list already
-    {
-      if(nextFrontier[i] == tile)
-      {
-        tileValid = false;
-      }
+      visited.push_back(p);
     }
+    frontier = nextFrontier;
+    nextFrontier.clear();
 
-    if(tileValid)//adds tile if valid is true
-    {
-      neighbors.push_back(tile);
-    }
-
-    if (world->catWinsOnSpace(tile))
-    {
-      exit = tile;
-      return neighbors;
-    }
   }
-  return neighbors;
+
+  return exit;
 }
 
