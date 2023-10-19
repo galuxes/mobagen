@@ -5,43 +5,40 @@
 vector<Point2D> Agent::GetNeighbors(Point2D point, World* world)//returns list of neighbors stops early if finds exit
 {
   vector<Point2D> neighbors = world->neighbors(point);
-  Point2D tile;
+  vector<Point2D> validNeighbors;
 
-
-  for (int i = 0; i < neighbors.size() - 1; i++)
+  for (auto tile : neighbors)
   {
+
     bool tileValid = true;
 
-    tile = neighbors[i];
-
-    if (!GetPointValidity(point, world))//checks in bounds
+    for (auto nTile : nextFrontier)  // checks not in list already
     {
-      tileValid = false;
-    }
-
-    if(!nextFrontier.empty()) {
-      for (int j = 0; j < nextFrontier.size() - 1; j++)  // checks not in list already
+      if (nTile == tile)
       {
-        if (nextFrontier[j] == tile)
-        {
-          tileValid = false;
-        }
+        tileValid = false;
       }
     }
 
-    if(!visited.empty()) {
-      for (int j = 0; j < visited.size() - 1; j++)  // checks not in list already
+    for (auto fTile : frontier)  // checks not in list already
+    {
+      if (fTile == tile)
       {
-        if (visited[j] == tile)
-        {
-          tileValid = false;
-        }
+        tileValid = false;
       }
     }
 
-    if(!tileValid)//adds tile if valid is true
+    for (auto vTile : visited)  // checks not in list already
     {
-      neighbors.erase(neighbors.begin()+i);
+      if (vTile == tile)
+      {
+        tileValid = false;
+      }
+    }
+
+    if(tileValid)//adds tile if valid is true
+    {
+      validNeighbors.push_back(tile);
     }
 
     if (world->catWinsOnSpace(tile) && tileValid)
@@ -50,7 +47,7 @@ vector<Point2D> Agent::GetNeighbors(Point2D point, World* world)//returns list o
       return neighbors;
     }
   }
-  return neighbors;
+  return validNeighbors;
 }
 
 bool Agent::GetPointValidity(Point2D tile, World* world)
