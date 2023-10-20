@@ -11,24 +11,34 @@ Point2D Cat::Move(World* world)
 
 }
 
-Point2D Cat::FindNearestExit(Point2D point, World* world)
+int Cat::FindNearestExit(Point2D point, World* world)
 {
   frontier.push_back(point);
+  int heuristic = 0;
 
   while(exit == Point2D(INT_MAX, INT_MAX))
   {
-    for(Point2D p : frontier)
+    for(auto fPoint : frontier)
     {
-      for (auto neighbor : GetNeighbors(p, world))
+      for (auto neighbor : GetNeighbors(fPoint, world))
       {
         nextFrontier.push_back(neighbor);
       }
-      visited.push_back(p);
+      visited.push_back(fPoint);
+      distances.push_back(heuristic);
     }
+    heuristic++;
     frontier = nextFrontier;
     nextFrontier.clear();
   }
 
-  return exit;
+  return heuristic;
 }
 
+void Cat::Cleanup()
+{
+  visited.clear();
+  nextFrontier.clear();
+  frontier.clear();
+  exit = Point2D(INT_MAX, INT_MAX);
+}

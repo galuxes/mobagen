@@ -8,7 +8,10 @@ class Cat : public Agent {
 public:
   explicit Cat() : Agent(){};
   Point2D Move(World*) override;
-  Point2D FindNearestExit(Point2D point, World* world);
+private:
+  vector<int> distances;
+  int FindNearestExit(Point2D point, World* world);
+  void Cleanup();
 };
 
 #endif  // CAT_H
